@@ -1,0 +1,102 @@
+# Session file started:  2021/04/14 09:51:56
+# CFX-20.1
+
+# To avoid unnecessary file pre-processing and modifications, include
+# COMMAND FILE at the top of your session file.
+# If it is not included, the file is assumed to be older and will be
+# modified for backward compatibility.
+COMMAND FILE:
+  CFX Post Version = 20.1
+END
+
+# CCL from Turbo Chart Macro begins (execute)
+!$span_num = 0.5;
+!$file_name_first = ">D:/zgh/study/fourth_grade/graduate_design/project/calculate_data/Q_1.4/Euler Head/span_";
+!$file_name_last = ".csv";
+!$file_name = $file_name_first.$span_num.$file_name_last;
+!open TXT,$file_name;
+!print TXT "Streamwise,Euler_head\n";   # 如果文件a.txt存在，则其内容会被取代
+!for ($Streamwise_num = 0; $Streamwise_num <=1.001 ; $Streamwise_num = $Streamwise_num + 0.05) {
+  > delete Circumferential Surface, Circumferential Line, Circumferential Chart
+
+  INTERNAL TURBO LINE:Circumferential Line
+    Turbo Domain List = /DOMAIN GROUP:All Domains
+    Option = Circumferential
+    Streamwise Location = $Streamwise_num
+    Span = $span_num
+    Span Points = 10
+    Streamwise Points = 10
+    Theta Points = 100
+    Point Distribution Method = Equal Distance
+    Include Boundary Points = On
+    Reduction or Max Number = Max Number
+    Reduction Factor = 1.0
+    Maximum Number of Items = 10
+    Turbo Line Mode= Streamwise Location
+    Point Type = AR
+    Point 1 = 0 [m], 0 [m]
+    Point 2 = 1 [m], 0 [m]
+    Position 1 = 0.5
+    Position 2 = 0.5
+    Colour Mode = Variable
+    Colour Variable = Pressure
+
+    Line Width = 2
+  END
+  INTERNAL TURBO LINE:Circumferential Line
+    Colour Variable = Theta
+
+  END
+  CHART:Circumferential Chart
+    Chart Type = XY
+    Chart Title = Circumferential Chart
+    Chart X Axis Label = Theta
+    Chart Y Axis Label = Pressure
+    CHART SERIES: Series 1
+      Chart Line Custom Data Selection = True
+      Chart X Variable = Theta
+      Chart Y Variable = Pressure
+      Series Name = Circumferential Chart Line
+      Location = Circumferential Line
+      CHART LINE: Chart Line 1
+        Line Name = Circumferential Chart Line
+        Chart Line Style = Solid
+        Auto Chart Line Colour = false
+        Auto Chart Symbol Colour = false
+        Chart Line Colour = 0, 0, 1
+        Chart Symbol Colour = 0, 0, 1
+        Chart Symbol Style = Ellipse
+      END
+    END
+  END
+  # CCL from Turbo Chart Macro ends (execute)
+
+  >hide /INTERNAL TURBO LINE:Circumferential Line, view=/VIEW:Turbo Regions View
+
+  VIEWPORT MANAGER:
+    Maximized Viewport = -1
+    Synchronize Camera = false
+    Synchronize Visibility = false
+    View Length Units = m
+    Viewer Camera Z = -5
+    Viewer Eye Point = Normal
+    Viewer Eye Separation = 5
+    Viewport 1 View = Meridional View
+    Viewport 2 View = View 3
+    Viewport 3 View = View 2
+    Viewport 4 View = View 4
+    Viewport Layout = No Split
+    X Split = 0.5
+    Y Split = 0.5
+  END
+  
+  !$val_top = lengthInt("(Rotation Velocity X*Velocity in Stn Frame u + Rotation Velocity Y*Velocity in Stn Frame v + Rotation Velocity Z*Velocity in Stn Frame w)*(Velocity in Stn Frame u*Streamwise Direction X + Velocity in Stn Frame v*Streamwise Direction Y + Velocity in Stn Frame w*Streamwise Direction Z)/g","Circumferential Line");
+  !$val_buttom = lengthInt("Velocity in Stn Frame u*Streamwise Direction X + Velocity in Stn Frame v*Streamwise Direction Y + Velocity in Stn Frame w*Streamwise Direction Z","Circumferential Line");
+  !$val = $val_top/$val_buttom;
+
+  !print TXT "$Streamwise_num,$val\n";        #该行内容会附加到第二行
+!}
+!close TXT;
+
+# Session file stopped:  2021/04/14 09:52:14
+
